@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Terminus</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x1F680;</text></svg>">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #fef7ed;
+      color: #1a1a1a;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #1a1a1a;
+      text-shadow: 4px 4px 0px #fb923c;
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: #1a1a1a;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input {
+      width: 100%;
+      padding: 1rem;
+      border: 4px solid #1a1a1a;
+      background: white;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 1rem;
+      box-shadow: 8px 8px 0px #fb923c;
+      transition: all 0.1s ease;
+    }
+
+    input:focus {
+      outline: none;
+      transform: translate(-2px, -2px);
+      box-shadow: 12px 12px 0px #fb923c;
+    }
+
+    .static-display {
+      width: 100%;
+      padding: 1rem;
+      border: 4px solid #1a1a1a;
+      background: white;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 1rem;
+      box-shadow: 8px 8px 0px #fb923c;
+      height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      opacity: 1;
+      transition:
+        opacity 0.6s ease,
+        transform 0.1s ease,
+        box-shadow 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .static-display.active {
+      transform: translate(-2px, -2px);
+      box-shadow: 12px 12px 0px #fb923c;
+    }
+
+    .static-display a {
+      color: #fb923c;
+      font-weight: 900;
+      text-decoration: none;
+      background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      padding-bottom: 0.25rem;
+      border-bottom: 3px solid #fb923c;
+      transition: all 0.3s ease;
+    }
+
+    .static-display a:hover {
+      border-bottom: 3px dashed #fb923c;
+      text-shadow: 0 0 10px rgba(251, 146, 60, 0.4);
+      -webkit-text-fill-color: #fb923c;
+      filter: brightness(1.2);
+    }
+
+    .static-display a:active {
+      border-bottom: 3px dotted #fb923c;
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Terminus</h1>
+    <div class="form-group">
+      <label for="scriptName">Spell</label>
+      <input type="text" id="scriptName" placeholder="my-worker">
+    </div>
+    <div class="form-group">
+      <label for="code">Render</label>
+      <div class="static-display" id="code">
+The legend of the Cursed King has been whispered about for centuries, a cautionary tale of power and greed. It is said that he stumbled upon a mysterious artifact known as the Toxic Treasure, which brought him great wealth but also a terrible fate. Many believed that the treasure was tainted with dark magic, and that it slowly consumed the king's soul. As time went on, the king's downfall became apparent, leading some to wonder if the treasure was truly worth the price.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const scriptNameInput = document.getElementById('scriptName');
+    const codeDiv = document.getElementById('code');
+
+    const placeholders = [
+      'what brings you here?',
+      'broken website :(',
+      'you know spells?',
+      'here for the portal?',
+      'hq connects --> all places',
+      'careful what you wish for',
+      'only those who are worthy shall enter',
+      'you know who',
+      'he who created this',
+      'are you worthy?',
+      'the wind will take you there',
+      'listen',
+      'open your eyes',
+      'see through it'
+    ];
+
+    function getRandomPlaceholder() {
+      return placeholders[Math.floor(Math.random() * placeholders.length)];
+    }
+
+    scriptNameInput.placeholder = getRandomPlaceholder();
+
+    const originalContent = codeDiv.innerHTML.trim();
+    let vaultLink = '';
+
+    let currentState = 'original';
+
+    function fadeToContent(newHtml, newState) {
+      codeDiv.style.opacity = '0';
+      setTimeout(() => {
+        codeDiv.innerHTML = newHtml;
+        codeDiv.style.opacity = '1';
+        currentState = newState;
+      }, 600);
+    }
+
+    // Fetch the vault link from the Pages Function
+    async function initializeVaultLink() {
+      try {
+        const response = await fetch('/api/vault-link');
+        const data = await response.json();
+        vaultLink = `<a href="${data.url}" target="_blank" rel="noopener">Vault is now open :)/</a>`;
+      } catch (error) {
+        console.error('Failed to load vault link:', error);
+        vaultLink = '<a href="#" target="_blank" rel="noopener">Vault link unavailable</a>';
+      }
+    }
+
+    scriptNameInput.addEventListener('input', (e) => {
+      const value = e.target.value.trim().toLowerCase();
+
+      if (value === 'vault' && currentState !== 'vault') {
+        fadeToContent(vaultLink, 'vault');
+      } else if (value !== 'vault' && currentState !== 'original') {
+        fadeToContent(originalContent, 'original');
+      }
+    });
+
+    codeDiv.addEventListener('click', (e) => {
+      e.stopPropagation();
+      codeDiv.classList.add('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!codeDiv.contains(e.target)) {
+        codeDiv.classList.remove('active');
+      }
+    });
+
+    // Initialize vault link on page load
+    initializeVaultLink();
+  </script>
+</body>
+</html>
